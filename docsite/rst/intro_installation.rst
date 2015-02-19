@@ -107,9 +107,13 @@ To install from source.
 
 .. code-block:: bash
 
-    $ git clone git://github.com/ansible/ansible.git
+    $ git clone git://github.com/ansible/ansible.git --recursive
     $ cd ./ansible
     $ source ./hacking/env-setup
+
+If you want to suppress spurious warnings/errors, use:
+
+    $ source ./hacking/env-setup -q
 
 If you don't have pip installed in your version of Python, install pip::
 
@@ -117,7 +121,15 @@ If you don't have pip installed in your version of Python, install pip::
 
 Ansible also uses the following Python modules that need to be installed::
 
-    $ sudo pip install paramiko PyYAML jinja2 httplib2
+    $ sudo pip install paramiko PyYAML Jinja2 httplib2
+
+Note when updating ansible, be sure to not only update the source tree, but also the "submodules" in git
+which point at Ansible's own modules (not the same kind of modules, alas).
+
+.. code-block:: bash
+
+    $ git pull --rebase
+    $ git submodule update --init --recursive
 
 Once running the env-setup script you'll be running from checkout and the default inventory file
 will be /etc/ansible/hosts.  You can optionally specify an inventory file (see :doc:`intro_inventory`) 
@@ -144,7 +156,7 @@ Latest Release Via Yum
 ++++++++++++++++++++++
 
 RPMs are available from yum for `EPEL
-<http://fedoraproject.org/wiki/EPEL>`_ 6 and currently supported
+<http://fedoraproject.org/wiki/EPEL>`_ 6, 7, and currently supported
 Fedora distributions. 
 
 Ansible itself can manage earlier operating
@@ -161,25 +173,28 @@ You can also build an RPM yourself.  From the root of a checkout or tarball, use
 
 .. code-block:: bash
 
-    $ git clone git://github.com/ansible/ansible.git
+    $ git clone git://github.com/ansible/ansible.git --recursive
     $ cd ./ansible
     $ make rpm
-    $ sudo rpm -Uvh ~/rpmbuild/ansible-*.noarch.rpm
+    $ sudo rpm -Uvh ./rpmbuild/ansible-*.noarch.rpm
 
 .. _from_apt:
 
 Latest Releases Via Apt (Ubuntu)
 ++++++++++++++++++++++++++++++++
 
-Ubuntu builds are available `in a PPA here <https://launchpad.net/~rquillo/+archive/ansible>`_.
+Ubuntu builds are available `in a PPA here <https://launchpad.net/~ansible/+archive/ansible>`_.
 
-Once configured, 
+To configure the PPA on your machine and install ansible run these commands:
 
 .. code-block:: bash
 
-    $ sudo apt-add-repository ppa:rquillo/ansible
+    $ sudo apt-get install software-properties-common
+    $ sudo apt-add-repository ppa:ansible/ansible
     $ sudo apt-get update
     $ sudo apt-get install ansible
+
+.. note:: On older Ubuntu distributions, "software-properties-common" is called "python-software-properties".
 
 Debian/Ubuntu packages can also be built from the source checkout, run:
 
@@ -190,6 +205,24 @@ Debian/Ubuntu packages can also be built from the source checkout, run:
 You may also wish to run from source to get the latest, which is covered above.
 
 .. _from_pkg:
+
+Latest Releases Via Portage (Gentoo)
+++++++++++++++++++++++++++++++++++++
+
+.. code-block:: bash
+
+    $ emerge -av app-admin/ansible
+
+To install the newest version, you may need to unmask the ansible package prior to emerging:
+
+.. code-block:: bash
+
+    $ echo 'app-admin/ansible' >> /etc/portage/package.accept_keywords
+
+.. note::
+
+   If you have Python 3 as a default Python slot on your Gentoo nodes (default setting), then you
+   must set ``ansible_python_interpreter = /usr/bin/python2`` in your group or inventory variables.
 
 Latest Releases Via pkg (FreeBSD)
 +++++++++++++++++++++++++++++++++
@@ -216,6 +249,18 @@ To install on a Mac, make sure you have Homebrew, then run:
     $ brew update
     $ brew install ansible
 
+.. _from_pkgutil:
+
+Latest Releases Via OpenCSW (Solaris)
++++++++++++++++++++++++++++++++++++++
+
+Ansible is available for Solaris as `SysV package from OpenCSW <https://www.opencsw.org/packages/ansible/>`_.
+
+.. code-block:: bash
+
+    # pkgadd -d http://get.opencsw.org/now
+    # /opt/csw/bin/pkgutil -i ansible
+
 .. _from_pip:
 
 Latest Releases Via Pip
@@ -229,6 +274,10 @@ your version of Python, you can get pip by::
 Then install Ansible with::
 
    $ sudo pip install ansible
+
+If you are installing on OS X Mavericks, you may encounter some noise from your compiler.  A workaround is to do the following::
+
+   $ sudo CFLAGS=-Qunused-arguments CPPFLAGS=-Qunused-arguments pip install ansible
 
 Readers that use virtualenv can also install Ansible under virtualenv, though we'd recommend to not worry about it and just install Ansible globally.  Do not use easy_install to install ansible directly.
 

@@ -109,7 +109,7 @@ Host Key Checking
 
 Ansible 1.2.1 and later have host key checking enabled by default.  
 
-If a host is reinstalled and has a different key in 'known_hosts', this will result in a error message until corrected.  If a host is not initially in 'known_hosts' this will result in prompting for confirmation of the key, which results in a interactive experience if using Ansible, from say, cron.  You might not want this.
+If a host is reinstalled and has a different key in 'known_hosts', this will result in an error message until corrected.  If a host is not initially in 'known_hosts' this will result in prompting for confirmation of the key, which results in an interactive experience if using Ansible, from say, cron.  You might not want this.
 
 If you wish to disable this behavior and understand the implications, you can do so by editing /etc/ansible/ansible.cfg or ~/.ansible.cfg::
 
@@ -126,8 +126,9 @@ Also note that host key checking in paramiko mode is reasonably slow, therefore 
 
 .. _a_note_about_logging:
 
-Ansible will log some information about module arguments on the remote system in the remote syslog.  To enable basic
-logging on the control machine see :doc:`intro_configuration` document and set the 'log_path' configuration file setting.  Enterprise users may also be interested in :doc:`tower`.  Tower provides a very robust database logging feature where it is possible to drill down and see history based on hosts, projects, and particular inventories over time -- explorable both graphically and through a REST API.
+Ansible will log some information about module arguments on the remote system in the remote syslog, unless a task or play is marked with a "no_log: True" attribute, explained later.
+
+To enable basic logging on the control machine see :doc:`intro_configuration` document and set the 'log_path' configuration file setting.  Enterprise users may also be interested in :doc:`tower`.  Tower provides a very robust database logging feature where it is possible to drill down and see history based on hosts, projects, and particular inventories over time -- explorable both graphically and through a REST API.
 
 .. seealso::
 

@@ -1,8 +1,9 @@
 Using Lookups
 =============
 
-Lookup plugins allow access of data in Ansible from outside sources.  This can include the filesystem
-but also external datastores.  These values are then made available using the standard templating system
+Lookup plugins allow access of data in Ansible from outside sources.  These plugins are evaluated on the Ansible control
+machine, and can include reading the filesystem but also contacting external datastores and services.  
+These values are then made available using the standard templating system
 in Ansible, and are typically used to load variables or templates with information from those systems.
 
 .. note:: This is considered an advanced feature, and many users will probably not rely on these features.  
@@ -72,7 +73,7 @@ Starting in version 1.4, password accepts a "chars" parameter to allow defining 
 
         # create a mysql user with a random password using only ascii letters:
         - mysql_user: name={{ client }}
-                      password="{{ lookup('password', '/tmp/passwordfile chars=ascii') }}"
+                      password="{{ lookup('password', '/tmp/passwordfile chars=ascii_letters') }}"
                       priv={{ client }}_{{ tier }}_{{ role }}.*:ALL
 
         # create a mysql user with a random password using only digits:
@@ -82,7 +83,7 @@ Starting in version 1.4, password accepts a "chars" parameter to allow defining 
 
         # create a mysql user with a random password using many different char sets:
         - mysql_user: name={{ client }}
-                      password="{{ lookup('password', '/tmp/passwordfile chars=ascii,numbers,digits,hexdigits,punctuation') }}"
+                      password="{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits,hexdigits,punctuation') }}"
                       priv={{ client }}_{{ tier }}_{{ role }}.*:ALL
 
         (...)
@@ -118,11 +119,19 @@ Here are some examples::
 
          - debug: msg="{{ lookup('pipe','date') }} is the raw result of running this command"
 
+         # redis_kv lookup requires the Python redis package
          - debug: msg="{{ lookup('redis_kv', 'redis://localhost:6379,somekey') }} is value in Redis for somekey"
 
+         # dnstxt lookup requires the Python dnspython package
          - debug: msg="{{ lookup('dnstxt', 'example.com') }} is a DNS TXT record for example.com"
 
          - debug: msg="{{ lookup('template', './some_template.j2') }} is a value from evaluation of this template"
+
+         - debug: msg="{{ lookup('etcd', 'foo') }} is a value from a locally running etcd"
+
+         - debug: msg="{{item}}"
+           with_url:
+                - 'http://github.com/gremlin.keys'
 
 As an alternative you can also assign lookup plugins to variables or use them
 elsewhere.  This macros are evaluated each time they are used in a task (or
